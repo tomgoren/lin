@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hasura/go-graphql-client"
+	"github.com/jedib0t/go-pretty/v6/table"
 	toml "github.com/pelletier/go-toml"
 )
 
@@ -54,11 +55,10 @@ func getMyId(client *graphql.Client) string {
 	return query.Viewer.Id
 }
 
-type issues struct {
-	Nodes []struct {
-		Id    string
-		Title string
-	}
+type issues []struct {
+	Id    string
+	Title string
+	Url   string
 }
 
 func getIssuesForUserId(client *graphql.Client, id string) issues {
@@ -66,7 +66,9 @@ func getIssuesForUserId(client *graphql.Client, id string) issues {
 		User struct {
 			Id             string
 			Name           string
-			AssignedIssues issues
+			AssignedIssues struct {
+				Nodes issues
+			}
 		} `graphql:"user(id: $id)"`
 	}
 
@@ -78,7 +80,18 @@ func getIssuesForUserId(client *graphql.Client, id string) issues {
 	if err != nil {
 		fmt.Println(fmt.Errorf("bad %w", err))
 	}
-	return query.User.AssignedIssues
+	return query.User.AssignedIssues.Nodes
+}
+
+func getTable(issues issues) string {
+	t := table.NewWriter()
+	// t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"ID", "Title", "URL"})
+	for _, issue := range issues {
+		t.AppendRows([]table.Row{{issue.Id, issue.Title, issue.Url}})
+		t.AppendSeparator()
+	}
+	return t.Render()
 }
 
 func main() {
@@ -89,5 +102,5 @@ func main() {
 	client := graphql.NewClient(linearUrl, httpClient).WithDebug(true)
 	myId := getMyId(client)
 	myIssues := getIssuesForUserId(client, myId)
-	fmt.Println(myIssues)
+	fmt.Println(getTable(myIssues))
 }
