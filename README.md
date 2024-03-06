@@ -2,7 +2,7 @@
 
 ## Overview
 
-A CLI to interact with [Linear])(https://linear.app) written in Go.
+A CLI to interact with [Linear](https://linear.app) written in Go.
 
 ## Getting started
 
@@ -16,7 +16,7 @@ api_token = "verysecret123"
 ## Usage
 
 ```shell
-go build
+go build -o lin
 ./lin
 ```
 
