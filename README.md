@@ -20,6 +20,14 @@ go build -o lin
 ./lin
 ```
 
+### Install go
+
+If necessary, use `asdf` to install the correct version of Go for this project (defined in `./.tool-versions`):
+
+```
+asdf install golang
+```
+
 ## Notes
 
 This is still very much work in progress, and currently does very little.

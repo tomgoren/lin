@@ -9,6 +9,7 @@ import (
 
 	"github.com/hasura/go-graphql-client"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	toml "github.com/pelletier/go-toml"
 )
 
@@ -86,12 +87,16 @@ func getIssuesForUserId(client *graphql.Client, id string) issues {
 func getTable(issues issues) string {
 	t := table.NewWriter()
 	// t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"ID", "Title", "URL"})
+	t.AppendHeader(table.Row{"Title", "URL"})
 	for _, issue := range issues {
-		t.AppendRows([]table.Row{{issue.Id, issue.Title, issue.Url}})
+		t.AppendRows([]table.Row{{text.WrapSoft(issue.Title, 55), getShortUrl(issue.Url)}})
 		t.AppendSeparator()
 	}
 	return t.Render()
+}
+
+func getShortUrl(url string) string {
+	return url[0:9]
 }
 
 func main() {
